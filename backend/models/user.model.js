@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      required: true,
+    },
     lastLogin: {
       type: Date,
       default: Date.now,
@@ -32,4 +36,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const User = mongoose.model("user", userSchema)
+export const User = mongoose.model("user", userSchema);

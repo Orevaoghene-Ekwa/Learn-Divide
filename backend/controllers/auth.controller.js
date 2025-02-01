@@ -10,13 +10,13 @@ import {
 } from "../nodemailer/emails.js";
 
 export const signup = async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, role } = req.body;
   try {
     if (!email || !password || !name) {
       throw new Error("All fields are required");
     }
 
-    const userAlreadyExists = await User.findOne({ email });
+    const userAlreadyExists = await User.findOne({ email }).select("-password");
     if (userAlreadyExists) {
       return res
         .status(400)
@@ -29,6 +29,7 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       name,
+      role,
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
@@ -45,7 +46,7 @@ export const signup = async (req, res) => {
       message: "User created successfully",
       user: {
         ...user._doc,
-        password: undefined,
+        role: "student",
       },
     });
   } catch (error) {
@@ -58,8 +59,8 @@ export const verifyEmail = async (req, res) => {
   try {
     const user = await User.findOne({
       verificationToken: code,
-      verificationTokenExpiresAt: { $gt: new Date() }, 
-    }).select("-password"); 
+      verificationTokenExpiresAt: { $gt: new Date() },
+    }).select("-password");
 
     if (!user) {
       return res.status(400).json({
@@ -69,7 +70,7 @@ export const verifyEmail = async (req, res) => {
     }
 
     user.isVerified = true;
-    user.verificationToken = null; 
+    user.verificationToken = null;
     user.verificationTokenExpiresAt = null;
     await user.save();
 
@@ -86,11 +87,10 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("-password");
     if (!user) {
       return res
         .status(400)
@@ -112,7 +112,6 @@ export const login = async (req, res) => {
       message: "logged in successfully",
       user: {
         ...user._doc,
-        password: undefined,
       },
     });
   } catch (error) {
