@@ -7,7 +7,7 @@ import {
 import { sendEmail } from "./nodemailer.config.js";
 
 export const sendVerificationEmail = async (email, verificationToken) => {
-  const recipient = [{ email }];
+  const recipient = email;
   const subject = "Email Verification";
   const htmlContent = VERIFICATION_EMAIL_TEMPLATE.replace(
     "{verificationCode}",
@@ -29,7 +29,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
 };
 
 export const sendWelcomeEmail = async (email, name) => {
-  const recipient = [{ email }];
+  const recipient = email;
   const subject = `"Welcome," ${name}`;
   const htmlContent = WELCOME_EMAIL_TEMPLATE.replace("{username}", name);
   try {
@@ -47,7 +47,7 @@ export const sendWelcomeEmail = async (email, name) => {
 };
 
 export const sendPasswordResetEmail = async (email, resetURL) => {
-  const recipient = [{ email }];
+  const recipient = email;
   const subject = "Reset Your Password";
   const htmlContent = PASSWORD_RESET_REQUEST_TEMPLATE.replace(
     "{resetURL}",
@@ -66,7 +66,7 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
 };
 
 export const sendResetSuccessEmail = async (email) => {
-  const recipient = [{ email }];
+  const recipient = email;
 
   try {
     const response = await sendEmail({
