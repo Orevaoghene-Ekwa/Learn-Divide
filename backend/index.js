@@ -18,7 +18,7 @@ app.use(express.json()); // Parse incoming requests: req.body
 app.use(cookieParser()); // Parse incoming cookies
 
 app.use("/api/auth", authRoutes);
-if (process.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
   app.get("*", (req, res) => {
