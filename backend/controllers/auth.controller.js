@@ -29,7 +29,7 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       name,
-      role,
+      role: "student",
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
@@ -46,7 +46,6 @@ export const signup = async (req, res) => {
       message: "User created successfully",
       user: {
         ...user._doc,
-        role: "student",
       },
     });
   } catch (error) {
@@ -90,7 +89,7 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email }).select("-password");
+    const user = await User.findOne({ email });
     if (!user) {
       return res
         .status(400)
@@ -112,6 +111,7 @@ export const login = async (req, res) => {
       message: "logged in successfully",
       user: {
         ...user._doc,
+        passsword: undefined,
       },
     });
   } catch (error) {

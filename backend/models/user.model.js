@@ -18,7 +18,6 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      required: true,
     },
     lastLogin: {
       type: Date,
