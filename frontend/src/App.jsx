@@ -14,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import NavBar from "./components/NavBar";
+import Footer from "./components/Footer";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -53,7 +54,7 @@ function App() {
 	return (
 		<div
 			className='min-h-screen bg-gradient-to-br
-    from-gray-900 via-green-900 to-emerald-900 flex items-center justify-center relative overflow-hidden'
+    from-gray-900 via-green-900 to-emerald-900 flex flex-col items-center justify-center relative overflow-hidden'
 		>
 			<NavBar />
 			<FloatingShape color='bg-green-500' size='w-64 h-64' top='-5%' left='10%' delay={0} />
@@ -107,6 +108,7 @@ function App() {
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Routes>
 			<Toaster />
+			<Footer />
 		</div>
 	);
 }
