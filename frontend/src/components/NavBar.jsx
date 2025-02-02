@@ -7,18 +7,18 @@ import { motion } from "framer-motion";
 const LoggedOutLinks = () => (
   <>
     <li>
-      <Link className="hover:underline" to="/">
-        Home
-      </Link>
-    </li>
-    <li>
-      <Link className="hover:underline" to="/about">
-        About
+      <Link className="hover:underline" to="/tutor-signup">
+        Teach on Learn Divide
       </Link>
     </li>
     <li>
       <Link className="hover:underline" to="/signup">
         Sign Up
+      </Link>
+    </li>
+    <li>
+      <Link className="hover:underline" to="/login">
+        Login
       </Link>
     </li>
   </>
