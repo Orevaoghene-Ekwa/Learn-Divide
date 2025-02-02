@@ -12,13 +12,13 @@ const TutorSignupPage = () => {
 	const [password, setPassword] = useState("");
 	const navigate = useNavigate();
 
-	const { signup, error, isLoading } = useAuthStore();
+	const { tutorSignup, error, isLoading } = useAuthStore();
 
 	const handleSignUp = async (e) => {
 		e.preventDefault();
 
 		try {
-			await signup(email, password, name);
+			await tutorSignup(email, password, name);
 			navigate("/verify-email");
 		} catch (error) {
 			console.log(error);
