@@ -53,6 +53,50 @@ export const signup = async (req, res) => {
   }
 };
 
+export const tutorSignup = async (req, res) => {
+  const { email, password, name, role } = req.body;
+  try {
+    if (!email || !password || !name) {
+      throw new Error("All fields are required");
+    }
+
+    const userAlreadyExists = await User.findOne({ email }).select("-password");
+    if (userAlreadyExists) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User already exists" });
+    }
+
+    const hashedPassword = await bcryptjs.hash(password, 15);
+    const verificationToken = generateVerificationCode();
+    const user = new User({
+      email,
+      password: hashedPassword,
+      name,
+      role: "tutor",
+      verificationToken,
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    await user.save();
+
+    // jwt
+    generateTokenAndSetCookie(res, user._id);
+
+    await sendVerificationEmail(user.email, verificationToken);
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        ...user._doc,
+      },
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 export const verifyEmail = async (req, res) => {
   const { code } = req.body;
   try {
