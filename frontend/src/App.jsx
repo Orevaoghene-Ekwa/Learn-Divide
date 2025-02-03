@@ -1,12 +1,11 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import FloatingShape from "./components/FloatingShape";
 
-import SignUpPage from "./pages/SignUpPage";
-import LoginPage from "./pages/LoginPage";
-import EmailVerificationPage from "./pages/EmailVerificationPage";
-import DashboardPage from "./pages/DashboardPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
+import SignUpPage from "./pages/authPages/SignUpPage";
+import LoginPage from "./pages/authPages/LoginPage";
+import EmailVerificationPage from "./pages/authPages/EmailVerificationPage";
+import TutorDashboard from "./pages/tutorPages/TutorDashboard";
+import ForgotPasswordPage from "./pages/authPages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/authPages/ResetPasswordPage";
 
 import LoadingSpinner from "./components/LoadingSpinner";
 
@@ -15,7 +14,12 @@ import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
-import TutorSignupPage from "./pages/TutorSignupPage";
+import TutorSignupPage from "./pages/authPages/TutorSignupPage";
+import StudentDashboard from "./pages/studentPages/StudentDashboard";
+import LandingPage from "./pages/LandingPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import CreateCourse from "./pages/tutorPages/CreateCourse";
+import ProfilePage from "./pages/ProfilePage";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -29,6 +33,24 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/verify-email" replace />;
   }
 
+  return children;
+};
+
+const TutorRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (isAuthenticated && user.role !== "tutor") {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
+const StudentRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (isAuthenticated && user.role !== "student") {
+    return <Navigate to="/" replace />;
+  }
   return children;
 };
 
@@ -55,38 +77,33 @@ function App() {
   return (
     <div
       className="min-h-screen bg-gradient-to-br
-    from-gray-900 via-green-900 to-emerald-900 flex flex-col items-center justify-center relative overflow-hidden"
+    from-gray-900 via-green-900 to-gray-900 flex flex-col items-center justify-center relative overflow-hidden"
     >
       <NavBar />
-      <FloatingShape
-        color="bg-green-500"
-        size="w-64 h-64"
-        top="-5%"
-        left="10%"
-        delay={0}
-      />
-      <FloatingShape
-        color="bg-emerald-500"
-        size="w-48 h-48"
-        top="70%"
-        left="80%"
-        delay={5}
-      />
-      <FloatingShape
-        color="bg-lime-500"
-        size="w-32 h-32"
-        top="40%"
-        left="-10%"
-        delay={2}
-      />
-
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route
-          path="/"
+          path="/tutor-dashboard"
           element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
+            <TutorRoute>
+              <TutorDashboard />
+            </TutorRoute>
+          }
+        />
+        <Route
+        path="/create-course"
+          element={
+            <TutorRoute>
+              <CreateCourse />
+            </TutorRoute>
+          }
+        />
+        <Route
+          path="/student-dashboard"
+          element={
+            <StudentRoute>
+              <StudentDashboard />
+            </StudentRoute>
           }
         />
         <Route
@@ -97,10 +114,7 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
-        <Route
-          path="/tutor-signup"
-          element={<TutorSignupPage />}
-        />
+        <Route path="/tutor-signup" element={<TutorSignupPage />} />
         <Route
           path="/login"
           element={
@@ -109,7 +123,14 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
-        <Route path="/verify-email" element={<EmailVerificationPage />} />
+        <Route
+          path="/verify-email"
+          element={
+            <RedirectAuthenticatedUser>
+              <EmailVerificationPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
         <Route
           path="/forgot-password"
           element={
@@ -127,8 +148,16 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         {/* catch all routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toaster />
       <Footer />

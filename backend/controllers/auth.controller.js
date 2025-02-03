@@ -7,6 +7,7 @@ import {
   sendPasswordResetEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendResetSuccessEmail,
 } from "../nodemailer/emails.js";
 
 export const signup = async (req, res) => {
@@ -207,7 +208,7 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    const user = findOne({
+    const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiresAt: { $gt: Date.now() },
     });
