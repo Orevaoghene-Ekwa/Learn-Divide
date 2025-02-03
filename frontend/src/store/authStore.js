@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/auth";
-const COURSE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/course"; //`${API_URL}/course`
+const API_URL = import.meta.env.MODE || "http://localhost:5000/api/auth";
+const COURSE_URL = import.meta.env.MODE || "http://localhost:5000/api/course"; //`${API_URL}/course`
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set) => ({
