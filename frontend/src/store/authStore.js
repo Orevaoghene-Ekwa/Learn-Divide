@@ -164,10 +164,8 @@ export const useAuthStore = create((set) => ({
       console.log("API Response:", response.data); // Debugging
       set({ courseList: response.data.courseList || [], isLoading: false });
     } catch (error) {
-      set({
-        error: error.response.data.message || "No enrolled courses",
-        isLoading: false,
-      });
+      console.log(error)
+      set({isLoading: false});
       throw error;
     }
   },
@@ -225,7 +223,8 @@ export const useAuthStore = create((set) => ({
         await enrolledCourses(response.data.user.enrolledCourses);
       }
     } catch (error) {
-      set({ error: error?.response?.data?.message, isCheckingAuth: false, isAuthenticated: false });
+      console.log(error)
+      set({ isCheckingAuth: false, isAuthenticated: false });
     }
   },
 

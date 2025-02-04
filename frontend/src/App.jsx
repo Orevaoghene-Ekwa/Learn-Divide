@@ -52,6 +52,9 @@ const TutorRoute = ({ children }) => {
 
 const StudentRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
+  if (!user.isVerified) {
+    return <Navigate to="/home" replace />;
+  }
 
   if (isAuthenticated && user.role !== "student") {
     return <Navigate to="/home" replace />;
