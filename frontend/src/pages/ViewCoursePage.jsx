@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NotFound from "./NotFoundPage";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -9,6 +9,7 @@ const ViewCoursePage = () => {
   const { id } = useParams();
   const location = useLocation();
   const { user, error, enrollStudent, isLoading } = useAuthStore();
+  const navigate = useNavigate()
 
   const course = location.state?.course;
 
@@ -20,6 +21,7 @@ const ViewCoursePage = () => {
     e.preventDefault();
     try {
       await enrollStudent(id, user.name, user.email);
+      navigate(`/course/${course._id}/`, { state: { course } })
       toast.success("Enrolled Successfully");
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";

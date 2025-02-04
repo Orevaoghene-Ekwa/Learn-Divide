@@ -16,18 +16,70 @@ export const createCourse = async (req, res) => {
   }
 };
 
-export const fetchCourses = async (req, res) => {
+export const fetchTutorCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ user: req.userID });
+    const { tutorName } = req.query;
+    if (!tutorName) {
+      return res.status(400).json({
+        success: false,
+        message: "Tutor Name is required",
+      });
+    }
+    const courses = await Course.find({ instructor: tutorName });
     
     res.status(200).json({
       success: true,
-      courses,
+      tutorCourses: courses,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error fetching courses",
+    });
+  }
+};
+
+export const fetchAllCourses = async (req, res) => {
+  try {
+    const courses = await Course.find(); // Fetch all courses
+    
+    res.status(200).json({
+      success: true,
+      allCourses: courses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching courses",
+    });
+  }
+};
+
+export const enrolledCourses = async (req, res) => {
+  try {
+    console.log("Request User ID:", req.userId); // Debugging line
+
+    if (!req.userID) {
+      return res.status(401).json({ success: false, message: "Unauthorized: No user ID" });
+    }
+    const user = await User.findById(req.userID).populate('enrolledCourses');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      courseList: user.enrolledCourses,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving enrolled courses",
     });
   }
 };
@@ -69,6 +121,41 @@ export const enrollStudent = async (req, res) => {
   }
 };
 
+export const updateProgress = async (req, res) => {
+  try {
+    const { courseId, videoId, email } = req.body;
+
+    // Find the course and student
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found." });
+    }
+
+    const student = course.students.find(student => student.email === email);
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not enrolled in course." });
+    }
+
+    // Check if the video is already watched
+    if (!student.watchedVideos.includes(videoId)) {
+      // Add video to watchedVideos
+      student.watchedVideos.push(videoId);
+    }
+
+    // Calculate progress
+    const totalVideos = course.videos.length;
+    const watchedVideos = student.watchedVideos.length;
+    student.progress = (watchedVideos / totalVideos) * 100;
+
+    // Save the course with updated progress
+    await course.save();
+
+    res.status(200).json({ success: true, message: "Progress updated successfully.", progress: student.progress });
+  } catch (error) {
+    console.error("Error updating progress:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 
 export const addFeedback = async (req, res) => {
   const { courseId, studentName, comment, rating } = req.body;

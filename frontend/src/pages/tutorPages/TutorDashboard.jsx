@@ -3,7 +3,7 @@ import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 
 const TutorDashboard = () => {
-  const { user, courses } = useAuthStore();
+  const { user, tutorCourses } = useAuthStore();
   const navigate = useNavigate();
 
   const handleCourseClick = (course) => {
@@ -19,8 +19,8 @@ const TutorDashboard = () => {
       <div className="mt-6">
         <h2 className="text-2xl text-gray-300 font-semibold">Your Courses</h2>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {courses && courses.length > 0 ? (
-            courses.map((course) => (
+          {tutorCourses && tutorCourses.length > 0 ? (
+            tutorCourses.map((course) => (
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

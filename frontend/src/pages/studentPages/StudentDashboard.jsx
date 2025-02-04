@@ -3,7 +3,7 @@ import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 
 const StudentDashboard = () => {
-  const { user, courses } = useAuthStore();
+  const { user, courseList } = useAuthStore();
   const navigate = useNavigate();
 
   const handleCourseClick = (course) => {
@@ -19,8 +19,8 @@ const StudentDashboard = () => {
       <div className="mt-6">
         <h2 className="text-2xl text-gray-300 font-semibold">Your Courses</h2>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {courses && courses.length > 0 ? (
-            courses.map((course) => (
+          {courseList && courseList.length > 0 ? (
+            courseList.map((course) => (
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -39,11 +39,11 @@ const StudentDashboard = () => {
           ) : (
             <>
               <p className="text-gray-500">
-                You have not uploaded any courses yet.
+                You have not enrolled in any courses yet.
               </p>
               <p>
-                <Link to="/create-course" className="text-green-400 underline">
-                  Create Course
+                <Link to="/" className="text-green-400 underline">
+                  Find a Course
                 </Link>
               </p>
             </>

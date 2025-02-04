@@ -13,7 +13,10 @@ axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set) => ({
   user: null,
+  allCourses: [],
+  tutorCourses: [],
   courses: [],
+  courseList: [],
   isAuthenticated: false,
   error: null,
   isLoading: false,
@@ -87,11 +90,27 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  fetchCourses: async () => {
+  fetchAllCourses: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get(`${COURSE_URL}/tutor-courses`); // Adjust API endpoint
-      set({ courses: response.data.courses, isLoading: false });
+      const response = await axios.get(`${COURSE_URL}/courses`); 
+      set({ allCourses: response.data.allCourses || [], isLoading: false });
+    } catch (error) {
+      set({
+        error: error?.response?.data?.message || "Error fetching courses",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  fetchTutorCourses: async (tutorName) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get(`${COURSE_URL}/tutor-courses`, {
+        params: { tutorName }, 
+      }); 
+      set({ tutorCourses: response.data.tutorCourses || [], isLoading: false });
     } catch (error) {
       set({
         error: error?.response?.data?.message || "Error fetching courses",
@@ -108,10 +127,48 @@ export const useAuthStore = create((set) => ({
         name,
         email,
       });
-      set({ course: response.data.course, error:null, isLoading: false });
+      set({ course: response.data.course, error: null, isLoading: false });
     } catch (error) {
       set({
         error: error.response.data.message || "Error occured during enrollment",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  updateProgress: async (courseId, videoId, email) => {
+    set({ error: null });
+    try {
+      const response = await axios.post(`${COURSE_URL}/update-progress`, {
+        courseId,
+        videoId,
+        email,
+      });
+      set({ progress: response.data.progress, error: null });
+    } catch (error) {
+      set({
+        error: error.response.data.message || "Error occured during enrollment",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  enrolledCourses: async () => {
+    set({isLoading:true, error:null})
+    try {
+      const response = await axios.get(`${COURSE_URL}/enrolled-courses`, {
+        withCredentials: true, // Ensures cookies are sent if using HTTP-only JWT
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure token is stored properly
+        },
+      });
+      console.log("API Response:", response.data); // Debugging
+      set({ courseList: response.data.courseList || [], isLoading: false });
+    } catch (error) {
+      set({
+        error: error.response.data.message || "No enrolled courses",
         isLoading: false,
       });
       throw error;
@@ -133,7 +190,12 @@ export const useAuthStore = create((set) => ({
       });
 
       // Fetch courses after login
-      await useAuthStore.getState().fetchCourses();
+      const { fetchTutorCourses, enrolledCourses, fetchAllCourses } = useAuthStore.getState()
+      await fetchAllCourses()
+      await enrolledCourses();
+      if (response.data.user.role === "tutor") { // Check if the user is a tutor
+        await fetchTutorCourses(response.data.user.name); // Pass the tutor's ID
+      }
     } catch (error) {
       set({
         error: error?.response?.data?.message || "Error logging in",
@@ -147,6 +209,7 @@ export const useAuthStore = create((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       const response = await axios.get(`${API_URL}/check-auth`);
+      console.log("Auth Check Response:", response.data);
       set({
         user: response.data.user,
         isAuthenticated: true,
@@ -154,9 +217,13 @@ export const useAuthStore = create((set) => ({
       });
 
       // Fetch courses after authentication check
-      await useAuthStore.getState().fetchCourses();
+      const { fetchTutorCourses, fetchAllCourses } = useAuthStore.getState();
+      await fetchAllCourses();
+      if (response.data.user.role === "tutor") { // Check if the user is a tutor
+        await fetchTutorCourses(response.data.user.name); // Pass the tutor's ID
+      }
     } catch (error) {
-      set({ error: null, isCheckingAuth: false, isAuthenticated: false });
+      set({ error: error?.response?.data?.message, isCheckingAuth: false, isAuthenticated: false });
     }
   },
 
@@ -177,4 +244,41 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  verifyEmail: async (code) => {
+		set({ isLoading: true, error: null });
+		try {
+			const response = await axios.post(`${API_URL}/verify-email`, { code });
+			set({ user: response.data.user, isAuthenticated: true, isLoading: false });
+			return response.data;
+		} catch (error) {
+			set({ error: error.response.data.message || "Error verifying email", isLoading: false });
+			throw error;
+		}
+	},
+  forgotPassword: async (email) => {
+		set({ isLoading: true, error: null });
+		try {
+			const response = await axios.post(`${API_URL}/forgot-password`, { email });
+			set({ message: response.data.message, isLoading: false });
+		} catch (error) {
+			set({
+				isLoading: false,
+				error: error.response.data.message || "Error sending reset password email",
+			});
+			throw error;
+		}
+	},
+  resetPassword: async (token, password) => {
+		set({ isLoading: true, error: null });
+		try {
+			const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+			set({ message: response.data.message, isLoading: false });
+		} catch (error) {
+			set({
+				isLoading: false,
+				error: error.response.data.message || "Error resetting password",
+			});
+			throw error;
+		}
+	},
 }));

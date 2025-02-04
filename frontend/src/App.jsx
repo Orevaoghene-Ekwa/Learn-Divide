@@ -21,6 +21,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import CreateCourse from "./pages/tutorPages/CreateCourse";
 import ProfilePage from "./pages/ProfilePage";
 import ViewCoursePage from "./pages/ViewCoursePage";
+import CoursePage from "./pages/studentPages/CoursePage";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -155,6 +156,14 @@ function App() {
             <ProtectedRoute>
               <ViewCoursePage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/course/content/:id"
+          element={
+            <StudentRoute>
+              <CoursePage />
+            </StudentRoute>
           }
         />
         <Route
