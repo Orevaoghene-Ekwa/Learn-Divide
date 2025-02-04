@@ -20,6 +20,7 @@ import LandingPage from "./pages/LandingPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CreateCourse from "./pages/tutorPages/CreateCourse";
 import ProfilePage from "./pages/ProfilePage";
+import ViewCoursePage from "./pages/ViewCoursePage";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -146,6 +147,14 @@ function App() {
             <RedirectAuthenticatedUser>
               <ResetPasswordPage />
             </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path="/course/:id"
+          element={
+            <ProtectedRoute>
+              <ViewCoursePage />
+            </ProtectedRoute>
           }
         />
         <Route

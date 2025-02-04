@@ -1,6 +1,6 @@
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-import { useState } from "react";
 import { GraduationCap } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -28,12 +28,7 @@ const StudentLinks = () => (
   <>
     <li>
       <Link className="hover:underline" to="/student-dashboard">
-        Dashboard
-      </Link>
-    </li>
-    <li>
-      <Link className="hover:underline" to="/courses">
-        My Courses
+        My Learning
       </Link>
     </li>
     <li>
@@ -67,10 +62,25 @@ const TutorLinks = () => (
 const NavBar = () => {
   const { isAuthenticated, user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef(null); // Create a reference for the mobile menu
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  // Close the mobile menu if clicked outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-md z-50">
@@ -110,7 +120,10 @@ const NavBar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute top-0 right-0 w-1/3 h-screen bg-green-700/40 p-4 md:hidden">
+        <div
+          ref={menuRef}
+          className="absolute top-0 right-0 w-1/3 h-screen bg-gray-900/80 p-4 md:hidden"
+        >
           <button
             className="absolute top-4 right-4 text-2xl"
             onClick={toggleMenu}

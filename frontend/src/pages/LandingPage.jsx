@@ -7,3 +7,13 @@ const LandingPage = () => {
 }
 
 export default LandingPage
+
+// User.find({ _id: userId })
+//   .populate('enrolledCourses')
+//   .exec((err, user) => {
+//     if (err) {
+//       console.error(err);
+//     } else {
+//       console.log(user.enrolledCourses);
+//     }
+//   });

@@ -14,7 +14,7 @@ import {
 import toast from "react-hot-toast";
 
 const CreateCourse = () => {
-  const { createCourse, error, user, isLoading } = useAuthStore();
+  const { createCourse, user, isLoading } = useAuthStore();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [instructor] = useState(user.name);
@@ -43,13 +43,6 @@ const CreateCourse = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // const courseData = {
-      //   title,
-      //   description,
-      //   instructor,
-      //   price,
-      //   videos
-      // }
       await createCourse(title, description, instructor, price, videos);
       navigate("/tutor-dashboard");
       toast.success("Course created successfully!", {
@@ -65,7 +58,7 @@ const CreateCourse = () => {
   return (
     <div className="flex min-h-screen w-screen mt-18">
       {/* Sidebar */}
-      <div className="w-1/4 p-6 border-r-6 bg-gray-900/80">
+      <div className="w-1/3 p-6 border-r-6 bg-gray-900/80">
         <h2 className="mt-10 text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
           Create Course
         </h2>
@@ -80,7 +73,7 @@ const CreateCourse = () => {
           <Input
             icon={PersonStanding}
             type="textarea"
-            placeholder="Course Description"
+            placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -170,7 +163,7 @@ const CreateCourse = () => {
       {/* Preview Section */}
       <div className="min-h-screen w-screen text-gray-300">
         <h2 className="mt-10 text-3xl font-bold mb-6 text-center">Preview</h2>
-        <div className="border p-4 rounded shadow">
+        <div className="p-4 rounded shadow">
           <h3 className="text-3xl font-semibold mb-3 bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
             {title || "Course Title"}
           </h3>
