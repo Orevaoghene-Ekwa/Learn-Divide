@@ -42,7 +42,7 @@ const StudentDashboard = () => {
                 You have not enrolled in any courses yet.
               </p>
               <p>
-                <Link to="/" className="text-green-400 underline">
+                <Link to="/home" className="text-green-400 underline">
                   Find a Course
                 </Link>
               </p>

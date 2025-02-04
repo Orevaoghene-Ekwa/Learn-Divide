@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Course } from "../models/course.model.js";
 import { User } from "../models/user.model.js";
 
@@ -13,6 +14,22 @@ export const createCourse = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const fetchAllCourses = async (req, res) => {
+  try {
+    const courses = await Course.find(); // Fetch all courses
+    
+    res.status(200).json({
+      success: true,
+      allCourses: courses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching courses",
+    });
   }
 };
 
@@ -39,41 +56,27 @@ export const fetchTutorCourses = async (req, res) => {
   }
 };
 
-export const fetchAllCourses = async (req, res) => {
-  try {
-    const courses = await Course.find(); // Fetch all courses
-    
-    res.status(200).json({
-      success: true,
-      allCourses: courses,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching courses",
-    });
-  }
-};
-
 export const enrolledCourses = async (req, res) => {
   try {
-    console.log("Request User ID:", req.userId); // Debugging line
+    const { coursesEnrolled } = req.query;
 
-    if (!req.userID) {
-      return res.status(401).json({ success: false, message: "Unauthorized: No user ID" });
+    if (!coursesEnrolled || !Array.isArray(coursesEnrolled) || coursesEnrolled.length === 0) {
+      return res.status(400).json({ success: false, message: "No courses enrolled" });
     }
-    const user = await User.findById(req.userID).populate('enrolledCourses');
-    
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+
+    // Ensure all IDs are valid ObjectIds
+    const validIds = coursesEnrolled.filter(id => mongoose.Types.ObjectId.isValid(id));
+
+    if (validIds.length === 0) {
+      return res.status(400).json({ success: false, message: "Invalid course IDs provided" });
     }
-    
+
+    // Fetch the courses using the valid ObjectIds
+    const courseList = await Course.find({ _id: { $in: validIds } });
+
     res.status(200).json({
       success: true,
-      courseList: user.enrolledCourses,
+      courseList,
     });
   } catch (error) {
     console.error(error);

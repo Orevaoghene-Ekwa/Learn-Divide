@@ -155,14 +155,11 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  enrolledCourses: async () => {
-    set({isLoading:true, error:null})
+  enrolledCourses: async (coursesEnrolled) => {
     try {
+    set({isLoading:true, error:null})
       const response = await axios.get(`${COURSE_URL}/enrolled-courses`, {
-        withCredentials: true, // Ensures cookies are sent if using HTTP-only JWT
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure token is stored properly
-        },
+        params: {coursesEnrolled}
       });
       console.log("API Response:", response.data); // Debugging
       set({ courseList: response.data.courseList || [], isLoading: false });
@@ -192,7 +189,9 @@ export const useAuthStore = create((set) => ({
       // Fetch courses after login
       const { fetchTutorCourses, enrolledCourses, fetchAllCourses } = useAuthStore.getState()
       await fetchAllCourses()
-      await enrolledCourses();
+      if (response.data.user.role === "student") {
+        await enrolledCourses(response.data.user.enrolledCourses);
+      }
       if (response.data.user.role === "tutor") { // Check if the user is a tutor
         await fetchTutorCourses(response.data.user.name); // Pass the tutor's ID
       }
@@ -217,10 +216,13 @@ export const useAuthStore = create((set) => ({
       });
 
       // Fetch courses after authentication check
-      const { fetchTutorCourses, fetchAllCourses } = useAuthStore.getState();
+      const { fetchTutorCourses, fetchAllCourses, enrolledCourses } = useAuthStore.getState();
       await fetchAllCourses();
       if (response.data.user.role === "tutor") { // Check if the user is a tutor
         await fetchTutorCourses(response.data.user.name); // Pass the tutor's ID
+      }
+      if (response.data.user.role === "student") {
+        await enrolledCourses(response.data.user.enrolledCourses);
       }
     } catch (error) {
       set({ error: error?.response?.data?.message, isCheckingAuth: false, isAuthenticated: false });

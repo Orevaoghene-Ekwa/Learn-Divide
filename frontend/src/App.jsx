@@ -40,9 +40,12 @@ const ProtectedRoute = ({ children }) => {
 
 const TutorRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
+  if (!user.isVerified) {
+    return <Navigate to="/home" replace />;
+  }
 
   if (isAuthenticated && user.role !== "tutor") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
   return children;
 };
@@ -51,7 +54,7 @@ const StudentRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (isAuthenticated && user.role !== "student") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
   return children;
 };
@@ -61,7 +64,7 @@ const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (isAuthenticated && user.isVerified) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return children;
@@ -83,7 +86,7 @@ function App() {
     >
       <NavBar />
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/home" element={<LandingPage />} />
         <Route
           path="/tutor-dashboard"
           element={
@@ -119,6 +122,14 @@ function App() {
         <Route path="/tutor-signup" element={<TutorSignupPage />} />
         <Route
           path="/login"
+          element={
+            <RedirectAuthenticatedUser>
+              <LoginPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path="/"
           element={
             <RedirectAuthenticatedUser>
               <LoginPage />

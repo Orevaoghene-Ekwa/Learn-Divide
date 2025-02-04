@@ -86,7 +86,7 @@ const NavBar = () => {
     <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-md z-50">
       <motion.div className="max-w-7xl mx-auto flex  items-center justify-between p-4 px-10">
         {/* Logo with Icon */}
-        <Link to="/">
+        <Link to="/home">
           <div className="hidden md:flex items-center text-3xl font-bold">
             <GraduationCap className="mr-2 w-10 h-10" />
             Learn Divide
@@ -94,10 +94,14 @@ const NavBar = () => {
         </Link>
 
         {/* Logo with Icon on Mobile */}
-        <div className="absolute left flex md:hidden items-center text-2xl font-bold ">
-          <GraduationCap className="mr-2 w-8 h-8" />
-          Learn Divide
-        </div>
+        
+          <div className="absolute left flex md:hidden items-center text-2xl font-bold ">
+          <Link to="/home" className="flex">
+            <GraduationCap className="mr-2 w-8 h-8" />
+            Learn Divide
+          </Link>
+          </div>
+        
 
         {/* Desktop Links */}
         <ul className="hidden md:flex space-x-6">

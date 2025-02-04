@@ -13,7 +13,7 @@ const courseRouter = express.Router();
 
 courseRouter.get("/tutor-courses", fetchTutorCourses);
 
-courseRouter.get("/enrolled-courses", verifyToken, enrolledCourses);
+courseRouter.get("/enrolled-courses", enrolledCourses);
 
 courseRouter.get("/courses", fetchAllCourses)
 
